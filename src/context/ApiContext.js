@@ -7,15 +7,32 @@ export const ApiContext=createContext("")
 
 export const ApiProvider=({children})=>{
 
-    const [termekLista, setTermekLista] = useState([])
+    const [termekLista, setTermekLista] = useState([]);
+    const [katLista, setKatLista] = useState([]);
 
     const vegpont = "https://fakestoreapi.com/products"
 
-    const getAdat = async (vegpont) => {
+    const getAdat = async (vegpont, callback) => {
         
         try {
             const response = await myAxios.get(vegpont);
             setTermekLista(response.data)
+            callback([...response.data])
+        } catch (err) {
+            console.log("Hiba történt");
+        } finally {
+
+        }
+
+    };
+
+
+
+    const postAdat = async (vegpont, adat) => {
+        
+        try {
+            const response = await myAxios.post(vegpont, adat);
+            console.log(response);
         } catch (err) {
             console.log("Hiba történt");
         } finally {
@@ -27,16 +44,17 @@ export const ApiProvider=({children})=>{
 
     function katt(){
 
-
     }
 
 
     useEffect(()=>{
-        getAdat(vegpont);
+        getAdat("/products", setTermekLista);
+        getAdat("/products/categories", setKatLista);
+
     }, [] );
 
     return (
-    <ApiContext.Provider value={{ termekLista, katt }}>
+    <ApiContext.Provider value={{ termekLista, postAdat, katLista}}>
         {children}
     </ApiContext.Provider>
     );
